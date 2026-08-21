@@ -18,6 +18,7 @@ interface UserMenuProps {
   role?: string;
   avatarSrc?: string;
   variant?: "header" | "sidebar";
+  isCollapsed?: boolean;
   className?: string;
 }
 
@@ -26,45 +27,58 @@ export function UserMenu({
   role = "Super Admin",
   avatarSrc = "/assets/avatar.png",
   variant = "header",
+  isCollapsed = false,
   className,
 }: UserMenuProps) {
+  const showDetails = variant === "header" ? true : !isCollapsed;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "flex items-center gap-2 rounded-xl transition-colors outline-none cursor-pointer select-none",
-            variant === "header"
-              ? "p-1 hover:bg-muted"
-              : "w-full p-2 hover:bg-muted",
+            "flex items-center rounded-xl transition-colors outline-none cursor-pointer select-none",
+            variant === "header" && "p-1 gap-2 hover:bg-muted",
+            variant === "sidebar" && !isCollapsed && "w-full p-2 gap-2 hover:bg-muted justify-between",
+            variant === "sidebar" && isCollapsed && "w-full p-1.5 justify-center hover:bg-muted",
             className
           )}
+          title={isCollapsed ? `${name} (${role})` : undefined}
         >
-          <UserAvatar src={avatarSrc} name={name} size="md" />
+          <UserAvatar src={avatarSrc} name={name} size="md" className="shrink-0" />
 
-          <div
-            className={cn(
-              "flex flex-col text-left leading-none min-w-0 flex-1",
-              variant === "header" ? "hidden md:flex" : "flex"
-            )}
-          >
-            <span className="text-[13px] font-semibold text-foreground truncate">
-              {name}
-            </span>
-            <span className="text-[11px] text-muted-foreground mt-0.5 truncate">
-              {role}
-            </span>
-          </div>
+          {showDetails && (
+            <>
+              <div
+                className={cn(
+                  "flex flex-col text-left leading-none min-w-0 flex-1 overflow-hidden",
+                  variant === "header" && "hidden md:flex"
+                )}
+              >
+                <span className="text-[13px] font-semibold text-foreground truncate">
+                  {name}
+                </span>
+                <span className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                  {role}
+                </span>
+              </div>
 
-          <ChevronDown
-            className="w-3.5 h-3.5 text-muted-foreground shrink-0"
-            strokeWidth={2}
-          />
+              <ChevronDown
+                className={cn(
+                  "w-3.5 h-3.5 text-muted-foreground shrink-0",
+                  variant === "header" && "hidden md:block"
+                )}
+                strokeWidth={2}
+              />
+            </>
+          )}
         </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        align={variant === "header" ? "end" : "start"}
+        side={variant === "sidebar" && isCollapsed ? "right" : "bottom"}
+        align={variant === "header" ? "end" : isCollapsed ? "end" : "start"}
+        sideOffset={8}
         className="w-56 bg-white border border-border shadow-dropdown rounded-xl p-1.5 z-50"
       >
         <DropdownMenuLabel className="px-2.5 py-2">

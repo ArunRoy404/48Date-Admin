@@ -206,8 +206,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       {/* Footer User Profile Card */}
-      <SidebarFooter className="p-2 border-t border-border bg-white">
-        <UserMenu variant="sidebar" />
+      <SidebarFooter className="p-2 border-t border-border bg-white flex items-center justify-center">
+        <UserMenu variant="sidebar" isCollapsed={isCollapsed} />
       </SidebarFooter>
 
       <SidebarRail />
