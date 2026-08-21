@@ -1,34 +1,60 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Reveal } from "@/components/common/Reveal";
 
-interface MonthlyRevenue {
+interface RevenueDataPoint {
   month: string;
-  mrr: number; // in thousands
-  total: number; // in thousands
-  displayTotal: string;
-  displayMrr: string;
+  mrr: number;
+  total: number;
 }
 
-const data: MonthlyRevenue[] = [
-  { month: "Jan", mrr: 35, total: 48, displayTotal: "$48k", displayMrr: "$35k" },
-  { month: "Feb", mrr: 48, total: 64, displayTotal: "$64k", displayMrr: "$48k" },
-  { month: "Mar", mrr: 59, total: 80, displayTotal: "$80k", displayMrr: "$59k" },
-  { month: "Apr", mrr: 74, total: 98, displayTotal: "$98k", displayMrr: "$74k" },
-  { month: "May", mrr: 93, total: 125, displayTotal: "$125k", displayMrr: "$93k" },
-  { month: "Jun", mrr: 123, total: 158, displayTotal: "$158k", displayMrr: "$123k" },
-  { month: "Jul", mrr: 152, total: 183, displayTotal: "$183k", displayMrr: "$152k" },
+const data: RevenueDataPoint[] = [
+  { month: "Jan", mrr: 35, total: 48 },
+  { month: "Feb", mrr: 48, total: 64 },
+  { month: "Mar", mrr: 59, total: 80 },
+  { month: "Apr", mrr: 74, total: 98 },
+  { month: "May", mrr: 93, total: 125 },
+  { month: "Jun", mrr: 123, total: 158 },
+  { month: "Jul", mrr: 152, total: 183 },
 ];
 
-const yLabels = ["$200k", "$150k", "$100k", "$50k", "$0k"];
+function CustomBarTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: Array<{ value: number; dataKey: string }>;
+  label?: string;
+}) {
+  if (active && payload && payload.length) {
+    const mrr = payload.find((p) => p.dataKey === "mrr")?.value || 0;
+    const total = payload.find((p) => p.dataKey === "total")?.value || 0;
+
+    return (
+      <div className="bg-foreground text-white text-[11px] px-2.5 py-1.5 rounded-lg shadow-lg pointer-events-none">
+        <div className="font-semibold text-white">${total}K Total Revenue</div>
+        <div className="text-white/70 text-[10px]">
+          MRR: ${mrr}K · {label}
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
 
 export default function RevenueChart() {
-  const [hoveredMonth, setHoveredMonth] = useState<string | null>("Jul");
-
-  const maxVal = 200;
-
   return (
     <Reveal className="h-full">
       <div className="bg-card rounded-2xl p-6 border border-border shadow-card flex flex-col justify-between h-full">
@@ -45,72 +71,47 @@ export default function RevenueChart() {
           <StatusBadge variant="brand">$183K this month</StatusBadge>
         </div>
 
-        {/* Bar Chart Area */}
-        <div className="relative mt-6 pt-4 pb-2">
-          {/* Y Axis & Grid Lines */}
-          <div className="space-y-7 relative">
-            {yLabels.map((label) => (
-              <div key={label} className="flex items-center gap-3">
-                <span className="w-10 text-right text-[11px] font-normal text-muted-foreground shrink-0">
-                  {label}
-                </span>
-                <div className="flex-1 h-px bg-[#f1f5f9]" />
-              </div>
-            ))}
-          </div>
-
-          {/* Bars Container Overlay */}
-          <div className="absolute inset-0 left-12 right-4 top-2 bottom-6 flex items-end justify-between px-2 sm:px-6">
-            {data.map((item) => {
-              const isHovered = hoveredMonth === item.month;
-              const barHeightPct = (item.total / maxVal) * 100;
-              const mrrHeightPct = (item.mrr / item.total) * 100;
-
-              return (
-                <div
-                  key={item.month}
-                  className="flex flex-col items-center group relative cursor-pointer h-full justify-end"
-                  onMouseEnter={() => setHoveredMonth(item.month)}
-                  onMouseLeave={() => setHoveredMonth(null)}
-                >
-                  {/* Floating Tooltip Indicator */}
-                  {isHovered && (
-                    <div className="absolute -top-7 bg-foreground text-white text-[11px] font-medium px-2 py-1 rounded-md shadow-md whitespace-nowrap z-20 pointer-events-none transform -translate-y-1">
-                      <span className="font-semibold text-white">{item.displayTotal}</span> (MRR {item.displayMrr})
-                    </div>
-                  )}
-
-                  {/* Dual-layer Bar */}
-                  <div
-                    className={`w-9 sm:w-12 rounded-t-lg relative overflow-hidden transition-all duration-200 ${
-                      isHovered ? "ring-2 ring-brand-crimson/20" : ""
-                    }`}
-                    style={{
-                      height: `${barHeightPct}%`,
-                      backgroundColor: "var(--brand-pink)",
-                    }}
-                  >
-                    {/* MRR Solid Fill */}
-                    <div
-                      className="w-full absolute bottom-0 bg-brand-crimson rounded-t-xs transition-all duration-300"
-                      style={{
-                        height: `${mrrHeightPct}%`,
-                      }}
-                    />
-                  </div>
-
-                  {/* Month Label */}
-                  <span
-                    className={`mt-2 text-[11px] font-medium transition-colors ${
-                      isHovered ? "text-foreground font-semibold" : "text-muted-foreground"
-                    }`}
-                  >
-                    {item.month}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+        {/* Recharts Bar Chart */}
+        <div className="mt-5 h-[210px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={data}
+              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              barGap={-36}
+            >
+              <CartesianGrid stroke="#f1f5f9" vertical={false} />
+              <XAxis
+                dataKey="month"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#9ca3af", fontSize: 11 }}
+                dy={8}
+              />
+              <YAxis
+                domain={[0, 200]}
+                ticks={[0, 50, 100, 150, 200]}
+                tickFormatter={(val) => `$${val}k`}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#9ca3af", fontSize: 11 }}
+              />
+              <Tooltip content={<CustomBarTooltip />} />
+              {/* Background Target/Total Bar */}
+              <Bar
+                dataKey="total"
+                fill="var(--brand-pink)"
+                radius={[8, 8, 0, 0]}
+                maxBarSize={44}
+              />
+              {/* Foreground MRR Bar */}
+              <Bar
+                dataKey="mrr"
+                fill="var(--brand-crimson)"
+                radius={[4, 4, 0, 0]}
+                maxBarSize={44}
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </Reveal>

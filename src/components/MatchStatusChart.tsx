@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import { Reveal } from "@/components/common/Reveal";
 
 interface StatusCategory {
@@ -44,16 +45,21 @@ const categories: StatusCategory[] = [
 
 const totalCount = categories.reduce((sum, c) => sum + c.count, 0);
 
+function CustomPieTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: StatusCategory }> }) {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-foreground text-white text-[11px] px-2.5 py-1.5 rounded-lg shadow-lg pointer-events-none">
+        <div className="font-semibold text-white">{data.name}</div>
+        <div className="text-white/70 text-[10px]">{data.formattedCount} ({Math.round((data.count / totalCount) * 100)}%)</div>
+      </div>
+    );
+  }
+  return null;
+}
+
 export default function MatchStatusChart() {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-
-  // SVG Donut metrics
-  const size = 152;
-  const strokeWidth = 24;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-
-  let accumulatedPercent = 0;
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   return (
     <Reveal delay={0.1} className="h-full">
@@ -66,71 +72,66 @@ export default function MatchStatusChart() {
           <p className="text-[12px] text-muted-foreground mt-0.5">Live distribution</p>
         </div>
 
-        {/* Donut Graphic */}
-        <div className="flex justify-center items-center my-4">
-          <div className="relative w-[152px] h-[152px]">
-            <svg
-              width={size}
-              height={size}
-              viewBox={`0 0 ${size} ${size}`}
-              className="transform -rotate-90"
-            >
-              {categories.map((cat) => {
-                const percent = cat.count / totalCount;
-                const rotation = accumulatedPercent * 360;
-                accumulatedPercent += percent;
-
-                const isHovered = activeCategory === cat.id;
-
-                return (
-                  <circle
-                    key={cat.id}
-                    cx={size / 2}
-                    cy={size / 2}
-                    r={radius}
-                    fill="transparent"
-                    stroke={cat.color}
-                    strokeWidth={isHovered ? strokeWidth + 3 : strokeWidth}
-                    strokeDasharray={`${circumference * percent} ${circumference}`}
-                    strokeDashoffset={0}
-                    transform={`rotate(${rotation} ${size / 2} ${size / 2})`}
-                    className="transition-all duration-200 cursor-pointer"
-                    onMouseEnter={() => setActiveCategory(cat.id)}
-                    onMouseLeave={() => setActiveCategory(null)}
+        {/* Recharts Donut Graphic */}
+        <div className="relative w-full h-[160px] flex items-center justify-center my-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Tooltip content={<CustomPieTooltip />} />
+              <Pie
+                data={categories}
+                dataKey="count"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={48}
+                outerRadius={72}
+                paddingAngle={2}
+                startAngle={90}
+                endAngle={-270}
+                onMouseEnter={(_, index) => setActiveIndex(index)}
+                onMouseLeave={() => setActiveIndex(null)}
+              >
+                {categories.map((entry, index) => (
+                  <Cell
+                    key={`cell-${entry.id}`}
+                    fill={entry.color}
+                    stroke="#ffffff"
+                    strokeWidth={activeIndex === index ? 3 : 1}
+                    className="transition-all cursor-pointer outline-none"
                   />
-                );
-              })}
-            </svg>
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
 
-            {/* Center Info on Hover */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              {activeCategory ? (
-                <>
-                  <span className="text-[11px] font-medium text-muted-foreground">
-                    {categories.find((c) => c.id === activeCategory)?.name}
-                  </span>
-                  <span className="text-[15px] font-bold text-foreground">
-                    {categories.find((c) => c.id === activeCategory)?.formattedCount}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="text-[10px] font-medium text-muted-foreground">
-                    Total
-                  </span>
-                  <span className="text-[15px] font-bold text-foreground">
-                    {totalCount.toLocaleString()}
-                  </span>
-                </>
-              )}
-            </div>
+          {/* Center Info Overlay */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            {activeIndex !== null && categories[activeIndex] ? (
+              <>
+                <span className="text-[10px] font-medium text-muted-foreground">
+                  {categories[activeIndex].name}
+                </span>
+                <span className="text-[15px] font-bold text-foreground">
+                  {categories[activeIndex].formattedCount}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-[10px] font-medium text-muted-foreground">
+                  Total
+                </span>
+                <span className="text-[15px] font-bold text-foreground">
+                  {totalCount.toLocaleString()}
+                </span>
+              </>
+            )}
           </div>
         </div>
 
         {/* Categories Legend List */}
         <div className="space-y-2 mt-2">
-          {categories.map((cat) => {
-            const isHovered = activeCategory === cat.id;
+          {categories.map((cat, idx) => {
+            const isHovered = activeIndex === idx;
 
             return (
               <div
@@ -138,8 +139,8 @@ export default function MatchStatusChart() {
                 className={`flex items-center justify-between py-1 px-2 rounded-lg transition-colors cursor-pointer ${
                   isHovered ? "bg-muted" : ""
                 }`}
-                onMouseEnter={() => setActiveCategory(cat.id)}
-                onMouseLeave={() => setActiveCategory(null)}
+                onMouseEnter={() => setActiveIndex(idx)}
+                onMouseLeave={() => setActiveIndex(null)}
               >
                 <div className="flex items-center gap-2">
                   <span
