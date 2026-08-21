@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -23,10 +25,9 @@ import { cn } from "@/lib/utils";
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const pathname = usePathname();
 
   const navGroups = useNavigationStore((state) => state.navGroups);
-  const activeNav = useNavigationStore((state) => state.activeNav);
-  const setActiveNav = useNavigationStore((state) => state.setActiveNav);
 
   return (
     <Sidebar
@@ -62,13 +63,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu className="space-y-0.5">
               {group.items.map((item) => {
                 const Icon = item.icon;
-                const isActive = activeNav === item.title;
+                const isActive =
+                  item.url === "/dashboard"
+                    ? pathname === "/dashboard" || pathname === "/"
+                    : pathname.startsWith(item.url) && item.url !== "#";
 
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
+                      asChild
                       isActive={isActive}
-                      onClick={() => setActiveNav(item.title)}
                       tooltip={item.title}
                       className={`h-9 px-3 rounded-lg text-[14px] font-medium transition-all ${
                         isActive
@@ -76,15 +80,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           : "text-slate-subtle hover:text-foreground hover:bg-muted"
                       }`}
                     >
-                      <Icon
-                        className={`w-[15px] h-[15px] shrink-0 ${
-                          isActive ? "text-brand-crimson" : "text-muted-foreground"
-                        }`}
-                        strokeWidth={isActive ? 2 : 1.75}
-                      />
-                      {!isCollapsed && (
-                        <span className="truncate">{item.title}</span>
-                      )}
+                      <Link href={item.url}>
+                        <Icon
+                          className={`w-[15px] h-[15px] shrink-0 ${
+                            isActive ? "text-brand-crimson" : "text-muted-foreground"
+                          }`}
+                          strokeWidth={isActive ? 2 : 1.75}
+                        />
+                        {!isCollapsed && (
+                          <span className="truncate">{item.title}</span>
+                        )}
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );

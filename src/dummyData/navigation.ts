@@ -34,7 +34,6 @@ export const navigationDummyData: NavGroup[] = [
         title: "Dashboard",
         url: "/dashboard",
         icon: LayoutDashboard,
-        isActive: true,
       },
     ],
   },
@@ -43,12 +42,12 @@ export const navigationDummyData: NavGroup[] = [
     items: [
       {
         title: "Users",
-        url: "#",
+        url: "/dashboard/users",
         icon: Users,
       },
       {
         title: "Verification",
-        url: "#",
+        url: "/dashboard/verification",
         icon: ShieldCheck,
       },
     ],
