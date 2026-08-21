@@ -2,6 +2,7 @@
 
 import React from "react";
 import { User, Flag, Heart, Calendar, CreditCard } from "lucide-react";
+import { Reveal } from "@/components/common/Reveal";
 
 interface ActivityItem {
   id: string;
@@ -20,8 +21,8 @@ const activities: ActivityItem[] = [
     action: "New user registered",
     time: "2 min ago",
     icon: User,
-    iconBg: "bg-[#eff6ff]",
-    iconColor: "text-[#155dfc]",
+    iconBg: "bg-info-light",
+    iconColor: "text-info",
   },
   {
     id: "2",
@@ -29,8 +30,8 @@ const activities: ActivityItem[] = [
     action: "High-severity report submitted",
     time: "15 min ago",
     icon: Flag,
-    iconBg: "bg-[#fef2f2]",
-    iconColor: "text-[#fb2c36]",
+    iconBg: "bg-destructive/10",
+    iconColor: "text-destructive",
   },
   {
     id: "3",
@@ -38,8 +39,8 @@ const activities: ActivityItem[] = [
     action: "New match with Tyler Brooks",
     time: "23 min ago",
     icon: Heart,
-    iconBg: "bg-[#fce7ef]",
-    iconColor: "text-[#e11d48]",
+    iconBg: "bg-brand-pink",
+    iconColor: "text-brand-crimson",
   },
   {
     id: "4",
@@ -47,8 +48,8 @@ const activities: ActivityItem[] = [
     action: "Date confirmed at Café Blue, SF",
     time: "41 min ago",
     icon: Calendar,
-    iconBg: "bg-[#f5f3ff]",
-    iconColor: "text-[#7f22fe]",
+    iconBg: "bg-purple-light",
+    iconColor: "text-purple",
   },
   {
     id: "5",
@@ -56,55 +57,57 @@ const activities: ActivityItem[] = [
     action: "Upgraded to Premium plan",
     time: "1h ago",
     icon: CreditCard,
-    iconBg: "bg-[#fffbeb]",
-    iconColor: "text-[#e17100]",
+    iconBg: "bg-warning-light",
+    iconColor: "text-warning-foreground",
   },
 ];
 
 export default function RecentActivity() {
   return (
-    <div className="bg-white rounded-2xl border border-[#e5e7eb] shadow-xs flex flex-col justify-between overflow-hidden h-full">
-      {/* Header */}
-      <div className="p-5 border-b border-[#e5e7eb]">
-        <h3 className="text-[18px] font-semibold text-[#111827] leading-tight">
-          Recent Activity
-        </h3>
-        <p className="text-[12px] text-[#99a1af] mt-0.5">Live feed</p>
-      </div>
+    <Reveal delay={0.15} className="h-full">
+      <div className="bg-card rounded-2xl border border-border shadow-card flex flex-col justify-between overflow-hidden h-full">
+        {/* Header */}
+        <div className="p-5 border-b border-border">
+          <h3 className="text-[18px] font-semibold text-foreground leading-tight">
+            Recent Activity
+          </h3>
+          <p className="text-[12px] text-muted-foreground mt-0.5">Live feed</p>
+        </div>
 
-      {/* Activity List Feed */}
-      <div className="divide-y divide-[#f3f4f6] flex-1 flex flex-col justify-between">
-        {activities.map((item) => {
-          const Icon = item.icon;
+        {/* Activity List Feed */}
+        <div className="divide-y divide-[#f3f4f6] flex-1 flex flex-col justify-between">
+          {activities.map((item) => {
+            const Icon = item.icon;
 
-          return (
-            <div
-              key={item.id}
-              className="px-4 py-3 flex items-center gap-3 hover:bg-[#f9fafb] transition-colors"
-            >
-              {/* Colored Rounded Icon Box */}
+            return (
               <div
-                className={`w-7 h-7 rounded-xl ${item.iconBg} flex items-center justify-center shrink-0`}
+                key={item.id}
+                className="px-4 py-3 flex items-center gap-3 hover:bg-muted transition-colors"
               >
-                <Icon className={`w-3.5 h-3.5 ${item.iconColor}`} strokeWidth={2} />
-              </div>
+                {/* Colored Rounded Icon Box */}
+                <div
+                  className={`w-7 h-7 rounded-xl ${item.iconBg} flex items-center justify-center shrink-0`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${item.iconColor}`} strokeWidth={2} />
+                </div>
 
-              {/* Text Info */}
-              <div className="flex-1 min-w-0">
-                <div className="text-[12px] font-medium text-[#111827] truncate">
-                  {item.name}
-                </div>
-                <div className="text-[12px] text-[#99a1af] truncate">
-                  {item.action}
-                </div>
-                <div className="text-[10px] text-[#d1d5dc] mt-0.5">
-                  {item.time}
+                {/* Text Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[12px] font-medium text-foreground truncate">
+                    {item.name}
+                  </div>
+                  <div className="text-[12px] text-muted-foreground truncate">
+                    {item.action}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground/60 mt-0.5">
+                    {item.time}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </Reveal>
   );
 }

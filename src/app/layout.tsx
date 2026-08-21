@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Manrope } from "next/font/google";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const inter = Inter({
@@ -26,10 +27,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${manrope.variable} h-full antialiased`}>
-      <body className="min-h-full font-sans bg-[#f8fafc] text-[#111827] flex flex-col">
-        {children}
+      <body className="min-h-full font-sans bg-background text-foreground flex flex-col">
+        <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>
   );
 }
-
