@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/common/Logo";
 import { UserMenu } from "@/components/common/UserMenu";
+import { cn } from "@/lib/utils";
 
 // 48Date Brand Navigation Structure
 const navGroups = [
@@ -144,13 +145,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       className="bg-white border-r border-border select-none"
       {...props}
     >
-      {/* Brand Header with Reusable Logo Component */}
-      <SidebarHeader className="h-[69px] px-4 flex flex-row items-center justify-between border-b border-border">
-        <div className="flex items-center gap-2 overflow-hidden">
-          <Logo collapsed={isCollapsed} size="md" />
-        </div>
+      {/* Brand Header: Logo hidden when collapsed */}
+      <SidebarHeader className="h-[69px] px-3 flex flex-row items-center justify-between border-b border-border">
+        {!isCollapsed && (
+          <div className="flex items-center pl-1 overflow-hidden">
+            <Logo size="md" />
+          </div>
+        )}
 
-        <SidebarTrigger className="text-muted-foreground hover:text-foreground hover:bg-muted" />
+        <SidebarTrigger
+          className={cn(
+            "text-muted-foreground hover:text-foreground hover:bg-muted transition-all",
+            isCollapsed && "mx-auto"
+          )}
+        />
       </SidebarHeader>
 
       {/* Navigation Groups */}

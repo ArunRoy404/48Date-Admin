@@ -44,10 +44,11 @@ export function Logo({ collapsed = false, className, size = "md" }: LogoProps) {
         />
       </svg>
 
-      {/* Brand Text Underneath in one column */}
+      {/* Two-color Brand Text Underneath in One Column */}
       {!collapsed && (
-        <span className="text-[7.5px] font-extrabold uppercase tracking-widest text-brand-crimson font-heading mt-1 leading-none">
-          48 Date
+        <span className="text-[9px] font-bold tracking-tight font-heading mt-1 leading-none select-none">
+          <span className="text-brand-crimson">48</span>
+          <span className="text-foreground">Date</span>
         </span>
       )}
     </div>

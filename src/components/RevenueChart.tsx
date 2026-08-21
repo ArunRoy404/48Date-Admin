@@ -15,18 +15,17 @@ import { Reveal } from "@/components/common/Reveal";
 
 interface RevenueDataPoint {
   month: string;
-  mrr: number;
-  total: number;
+  revenue: number;
 }
 
 const data: RevenueDataPoint[] = [
-  { month: "Jan", mrr: 35, total: 48 },
-  { month: "Feb", mrr: 48, total: 64 },
-  { month: "Mar", mrr: 59, total: 80 },
-  { month: "Apr", mrr: 74, total: 98 },
-  { month: "May", mrr: 93, total: 125 },
-  { month: "Jun", mrr: 123, total: 158 },
-  { month: "Jul", mrr: 152, total: 183 },
+  { month: "Jan", revenue: 40 },
+  { month: "Feb", revenue: 58 },
+  { month: "Mar", revenue: 72 },
+  { month: "Apr", revenue: 90 },
+  { month: "May", revenue: 115 },
+  { month: "Jun", revenue: 150 },
+  { month: "Jul", revenue: 183 },
 ];
 
 function CustomBarTooltip({
@@ -35,19 +34,16 @@ function CustomBarTooltip({
   label,
 }: {
   active?: boolean;
-  payload?: Array<{ value: number; dataKey: string }>;
+  payload?: Array<{ value: number }>;
   label?: string;
 }) {
   if (active && payload && payload.length) {
-    const mrr = payload.find((p) => p.dataKey === "mrr")?.value || 0;
-    const total = payload.find((p) => p.dataKey === "total")?.value || 0;
+    const rev = payload[0]?.value || 0;
 
     return (
       <div className="bg-foreground text-white text-[11px] px-2.5 py-1.5 rounded-lg shadow-lg pointer-events-none">
-        <div className="font-semibold text-white">${total}K Total Revenue</div>
-        <div className="text-white/70 text-[10px]">
-          MRR: ${mrr}K · {label}
-        </div>
+        <div className="font-semibold text-white">${rev}K Revenue</div>
+        <div className="text-white/70 text-[10px]">{label}</div>
       </div>
     );
   }
@@ -71,13 +67,12 @@ export default function RevenueChart() {
           <StatusBadge variant="brand">$183K this month</StatusBadge>
         </div>
 
-        {/* Recharts Bar Chart */}
+        {/* Recharts Single-Bar Chart matching Figma 1:1 */}
         <div className="mt-5 h-[210px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
               margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              barGap={-36}
             >
               <CartesianGrid stroke="#f1f5f9" vertical={false} />
               <XAxis
@@ -95,20 +90,14 @@ export default function RevenueChart() {
                 tickLine={false}
                 tick={{ fill: "#9ca3af", fontSize: 11 }}
               />
-              <Tooltip content={<CustomBarTooltip />} />
-              {/* Background Target/Total Bar */}
+              <Tooltip content={<CustomBarTooltip />} cursor={{ fill: "transparent" }} />
+              {/* Single Soft Pink Bar matching Figma */}
               <Bar
-                dataKey="total"
+                dataKey="revenue"
                 fill="var(--brand-pink)"
-                radius={[8, 8, 0, 0]}
-                maxBarSize={44}
-              />
-              {/* Foreground MRR Bar */}
-              <Bar
-                dataKey="mrr"
-                fill="var(--brand-crimson)"
-                radius={[4, 4, 0, 0]}
-                maxBarSize={44}
+                radius={[6, 6, 0, 0]}
+                maxBarSize={48}
+                className="transition-opacity hover:opacity-85"
               />
             </BarChart>
           </ResponsiveContainer>
