@@ -1,57 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import { Reveal } from "@/components/common/Reveal";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import type { MatchStatusCategory } from "@/dummyData/matchStatus";
 
-interface StatusCategory {
-  id: string;
-  name: string;
-  count: number;
-  formattedCount: string;
-  color: string;
-}
-
-const categories: StatusCategory[] = [
-  {
-    id: "active",
-    name: "Active",
-    count: 4280,
-    formattedCount: "4,280",
-    color: "#22c55e",
-  },
-  {
-    id: "completed",
-    name: "Completed",
-    count: 2840,
-    formattedCount: "2,840",
-    color: "#e11d48",
-  },
-  {
-    id: "expired",
-    name: "Expired",
-    count: 1560,
-    formattedCount: "1,560",
-    color: "#f59e0b",
-  },
-  {
-    id: "cancelled",
-    name: "Cancelled",
-    count: 820,
-    formattedCount: "820",
-    color: "#94a3b8",
-  },
-];
-
-const totalCount = categories.reduce((sum, c) => sum + c.count, 0);
-
-function CustomPieTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: StatusCategory }> }) {
+function CustomPieTooltip({
+  active,
+  payload,
+  total,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload: MatchStatusCategory }>;
+  total: number;
+}) {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
       <div className="bg-foreground text-white text-[11px] px-2.5 py-1.5 rounded-lg shadow-lg pointer-events-none">
         <div className="font-semibold text-white">{data.name}</div>
-        <div className="text-white/70 text-[10px]">{data.formattedCount} ({Math.round((data.count / totalCount) * 100)}%)</div>
+        <div className="text-white/70 text-[10px]">
+          {data.formattedCount} ({Math.round((data.count / (total || 1)) * 100)}%)
+        </div>
       </div>
     );
   }
@@ -59,7 +30,11 @@ function CustomPieTooltip({ active, payload }: { active?: boolean; payload?: Arr
 }
 
 export default function MatchStatusChart() {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const categories = useDashboardStore((state) => state.matchStatus);
+  const activeIndex = useDashboardStore((state) => state.activeMatchCategoryIndex);
+  const setActiveIndex = useDashboardStore((state) => state.setActiveMatchCategoryIndex);
+
+  const totalCount = categories.reduce((sum, c) => sum + c.count, 0);
 
   return (
     <Reveal delay={0.1} className="h-full">
@@ -76,7 +51,7 @@ export default function MatchStatusChart() {
         <div className="relative w-full h-[160px] flex items-center justify-center my-2">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Tooltip content={<CustomPieTooltip />} />
+              <Tooltip content={<CustomPieTooltip total={totalCount} />} />
               <Pie
                 data={categories}
                 dataKey="count"

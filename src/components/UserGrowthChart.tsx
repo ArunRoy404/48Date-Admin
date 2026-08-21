@@ -12,23 +12,17 @@ import {
 } from "recharts";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Reveal } from "@/components/common/Reveal";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface ChartDataPoint {
-  month: string;
-  users: number;
-}
-
-const data: ChartDataPoint[] = [
-  { month: "Jan", users: 3200 },
-  { month: "Feb", users: 4600 },
-  { month: "Mar", users: 6400 },
-  { month: "Apr", users: 8500 },
-  { month: "May", users: 11200 },
-  { month: "Jun", users: 14800 },
-  { month: "Jul", users: 18347 },
-];
-
-function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
+function CustomTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+}) {
   if (active && payload && payload.length) {
     return (
       <div className="bg-foreground text-white text-[11px] px-2.5 py-1.5 rounded-lg shadow-lg pointer-events-none">
@@ -43,6 +37,8 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 }
 
 export default function UserGrowthChart() {
+  const data = useDashboardStore((state) => state.userGrowth);
+
   return (
     <Reveal className="h-full">
       <div className="bg-card rounded-2xl p-6 border border-border shadow-card flex flex-col justify-between h-full">

@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { useUserStore } from "@/store/useUserStore";
 import { cn } from "@/lib/utils";
 
 interface UserMenuProps {
@@ -23,13 +24,19 @@ interface UserMenuProps {
 }
 
 export function UserMenu({
-  name = "Alex Rivera",
-  role = "Super Admin",
-  avatarSrc = "/assets/avatar.png",
+  name: propName,
+  role: propRole,
+  avatarSrc: propAvatarSrc,
   variant = "header",
   isCollapsed = false,
   className,
 }: UserMenuProps) {
+  const currentUser = useUserStore((state) => state.currentUser);
+
+  const name = propName ?? currentUser.name;
+  const role = propRole ?? currentUser.role;
+  const avatarSrc = propAvatarSrc ?? currentUser.avatarSrc;
+
   const showDetails = variant === "header" ? true : !isCollapsed;
 
   return (

@@ -1,94 +1,11 @@
 "use client";
 
 import React from "react";
-import {
-  Users,
-  Heart,
-  ShieldCheck,
-  CreditCard,
-  Flag,
-  Star,
-  Activity,
-  TrendingUp,
-  TrendingDown,
-} from "lucide-react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StaggerContainer, StaggerItem } from "@/components/common/StaggerContainer";
-
-interface StatItem {
-  id: string;
-  title: string;
-  value: string;
-  subtext: string;
-  trend?: {
-    value: string;
-    isUp: boolean;
-  };
-  icon: React.ElementType;
-  isPrimary?: boolean;
-}
-
-const row1Stats: StatItem[] = [
-  {
-    id: "total-users",
-    title: "Total Users",
-    value: "18,347",
-    subtext: "↑ 1,842 this month",
-    trend: { value: "12%", isUp: true },
-    icon: Users,
-  },
-  {
-    id: "active-matches",
-    title: "Active Matches",
-    value: "4,280",
-    subtext: "Within 48h window",
-    trend: { value: "8%", isUp: true },
-    icon: Heart,
-  },
-  {
-    id: "pending-verifications",
-    title: "Pending Verifications",
-    value: "24",
-    subtext: "5 flagged by AI",
-    icon: ShieldCheck,
-  },
-  {
-    id: "monthly-revenue",
-    title: "Monthly Revenue",
-    value: "$183K",
-    subtext: "↑ $35K vs last month",
-    trend: { value: "23%", isUp: true },
-    icon: CreditCard,
-    isPrimary: true,
-  },
-];
-
-const row2Stats: StatItem[] = [
-  {
-    id: "open-reports",
-    title: "Open Reports",
-    value: "12",
-    subtext: "3 high severity",
-    trend: { value: "3%", isUp: false },
-    icon: Flag,
-  },
-  {
-    id: "avg-trust-score",
-    title: "Avg Trust Score",
-    value: "76.4",
-    subtext: "Platform wide",
-    trend: { value: "2%", isUp: true },
-    icon: Star,
-  },
-  {
-    id: "match-success-rate",
-    title: "Match Success Rate",
-    value: "68.3%",
-    subtext: "Date completion",
-    trend: { value: "4%", isUp: true },
-    icon: Activity,
-  },
-];
+import { useDashboardStore } from "@/store/useDashboardStore";
+import type { StatItem } from "@/dummyData/stats";
 
 function Card({ item }: { item: StatItem }) {
   const Icon = item.icon;
@@ -162,6 +79,9 @@ function Card({ item }: { item: StatItem }) {
 }
 
 export default function StatCards() {
+  const row1Stats = useDashboardStore((state) => state.row1Stats);
+  const row2Stats = useDashboardStore((state) => state.row2Stats);
+
   return (
     <StaggerContainer className="space-y-5">
       {/* Row 1: 4 Cards */}

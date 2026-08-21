@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { PageHeader } from "@/components/common/PageHeader";
 import { CommonButton } from "@/components/common/CommonButton";
 import StatCards from "@/components/StatCards";
@@ -9,14 +9,11 @@ import MatchStatusChart from "@/components/MatchStatusChart";
 import RevenueChart from "@/components/RevenueChart";
 import RecentActivity from "@/components/RecentActivity";
 import { RotateCw, ArrowUpRight } from "lucide-react";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 export default function OverviewPage() {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 800);
-  };
+  const isRefreshing = useDashboardStore((state) => state.isRefreshing);
+  const refreshDashboard = useDashboardStore((state) => state.refreshDashboard);
 
   return (
     <main className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 max-w-[1600px] w-full mx-auto">
@@ -28,7 +25,8 @@ export default function OverviewPage() {
           <>
             <CommonButton
               variant="outline"
-              onClick={handleRefresh}
+              onClick={refreshDashboard}
+              loading={isRefreshing}
               icon={
                 <RotateCw
                   className={`w-3.5 h-3.5 text-secondary-foreground ${

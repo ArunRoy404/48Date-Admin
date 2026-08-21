@@ -12,21 +12,7 @@ import {
 } from "recharts";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Reveal } from "@/components/common/Reveal";
-
-interface RevenueDataPoint {
-  month: string;
-  revenue: number;
-}
-
-const data: RevenueDataPoint[] = [
-  { month: "Jan", revenue: 40 },
-  { month: "Feb", revenue: 58 },
-  { month: "Mar", revenue: 72 },
-  { month: "Apr", revenue: 90 },
-  { month: "May", revenue: 115 },
-  { month: "Jun", revenue: 150 },
-  { month: "Jul", revenue: 183 },
-];
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 function CustomBarTooltip({
   active,
@@ -51,6 +37,8 @@ function CustomBarTooltip({
 }
 
 export default function RevenueChart() {
+  const data = useDashboardStore((state) => state.revenue);
+
   return (
     <Reveal className="h-full">
       <div className="bg-card rounded-2xl p-6 border border-border shadow-card flex flex-col justify-between h-full">
